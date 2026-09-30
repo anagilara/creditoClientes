@@ -71,6 +71,23 @@ python -m unittest discover -s tests -v
 
 Las pruebas usan bases de datos temporales y cubren el listado, las operaciones CRUD, la búsqueda, el campo obligatorio y la protección CSRF. No modifican `clientes.db`.
 
+## CI/CD en Azure
+
+El workflow `.github/workflows/ci-cd.yml` compila y empaqueta la aplicación y ejecuta los tests en cada pull request y push a `main`. Tras un push a `main` que pase ambos jobs, crea el grupo de recursos, despliega `infra/main.bicep` y publica el paquete en Azure App Service.
+
+Configura estas variables del repositorio en GitHub Actions:
+
+- `AZURE_RESOURCE_GROUP`: grupo de recursos que se creará o reutilizará.
+- `AZURE_LOCATION`: región de Azure, por ejemplo `eastus`.
+- `AZURE_WEBAPP_NAME`: nombre globalmente único de la Web App, en minúsculas.
+
+Configura estos secretos:
+
+- `AZURE_CREDENTIALS`: credenciales JSON de un principal de servicio con permisos Contributor en la suscripción.
+- `APP_SECRET_KEY`: valor aleatorio y privado usado para firmar las sesiones y tokens CSRF.
+
+Bicep crea un App Service Plan Linux Basic (B1) y una Web App con Python 3.12. La base SQLite se guarda en `/home/clientes.db`, dentro del almacenamiento persistente de App Service.
+
 ## Configuración para despliegue
 
 - Define `SECRET_KEY` con un valor aleatorio y privado. El valor predeterminado del código es solo para desarrollo local.

@@ -7,7 +7,9 @@ from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "local-dev-key-change-before-deploy")
-app.config["DATABASE"] = Path(__file__).with_name("clientes.db")
+app.config["DATABASE"] = Path(
+    os.environ.get("DATABASE", Path(__file__).with_name("clientes.db"))
+)
 CSRFProtect(app)
 
 
